@@ -2,8 +2,6 @@ import csv
 import re
 
 
-#Bhaskar's Code
-
 def parseCSV(contentBytes):
     roll = []
     email = []

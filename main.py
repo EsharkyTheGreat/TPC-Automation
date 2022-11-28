@@ -5,7 +5,7 @@ import shutil
 import esharky
 import config
 import csv
-from aadeesh-bhaskar import *
+from aadeesh_bhaskar import *
 
 LOGIN_URL = "https://www.placement.iitbhu.ac.in/accounts/login/"
 NOTICE_BOARD = "https://www.placement.iitbhu.ac.in/forum/c/notice-board/2022-23/"
@@ -30,7 +30,6 @@ for i in range(44):
     notice_board_soup = bs4.BeautifulSoup(notice_board_req.text, 'html.parser')
     all_table_elements = notice_board_soup.find_all(
         'td', attrs={'class': 'topic-name'})
-
 
     for table_ele in all_table_elements:
         link_suffix = table_ele.a['href']
@@ -59,39 +58,41 @@ for i in range(44):
                         print("CSV")
                         # Parse CSV
                         with s.get("https://www.placement.iitbhu.ac.in/" + linkObject) as r:
-                            email,roll = parseCSV(r.content)
-                            esharky.createCSV(len(roll),None,email,roll,[company_name]*len(roll))
+                            email, roll = parseCSV(r.content)
+                            esharky.createCSV(len(roll), None, email, roll, [
+                                              company_name]*len(roll))
                         pass
                     elif "ods" in linkObject:
                         with s.get("https://www.placement.iitbhu.ac.in/" + linkObject) as r:
                             with open('./data.ods', "wb") as f:
                                 f.write(r.content)
                         esharky.convertODStoCSV("./data.ods")
-                        with open("./data.csv","rb") as f:
-                            email,roll = parseCSV(f.read())
-                        esharky.createCSV(len(roll),None,email,roll,[company_name]*len(roll))
+                        with open("./data.csv", "rb") as f:
+                            email, roll = parseCSV(f.read())
+                        esharky.createCSV(len(roll), None, email, roll, [
+                                          company_name]*len(roll))
                     elif "xlsx" in linkObject:
                         # TODO: Parse xlsx
                         print("XLSX")
             else:
                 # Check for Name and Mail and write
-#                content_split = content.text.split(" ")
-#                for ele in content_split:
-#                    if "che19" in ele:
-#                        x = re.findall('[A-Za-z0-9.]*.che19@i?itbhu\.ac\.in',ele)[0]
-#                        EMAIL_IDS.append(x)
-#                    elif "@" in ele:
-#                        x = re.findall('[A-Za-z0-9.]*.com',ele)[0]
-#                        EMAIL_IDS.append(x)
-#                    if "19045" in ele:
-#                        x = re.findall('\d{8}',ele)[0]
-#                        ROLL_NOS.append(x)
-#
-                
-                lines = content.get_text(strip = True, separator='\n')
+                #                content_split = content.text.split(" ")
+                #                for ele in content_split:
+                #                    if "che19" in ele:
+                #                        x = re.findall('[A-Za-z0-9.]*.che19@i?itbhu\.ac\.in',ele)[0]
+                #                        EMAIL_IDS.append(x)
+                #                    elif "@" in ele:
+                #                        x = re.findall('[A-Za-z0-9.]*.com',ele)[0]
+                #                        EMAIL_IDS.append(x)
+                #                    if "19045" in ele:
+                #                        x = re.findall('\d{8}',ele)[0]
+                #                        ROLL_NOS.append(x)
+                #
+
+                lines = content.get_text(strip=True, separator='\n')
  #               print(content.get_text(strip=True,separator='\n'))
                 for line in lines.split():
-                    x = re.findall('19045\d{3}',line)
+                    x = re.findall('19045\d{3}', line)
                     if len(x) > 0:
                         ROLL_NOS.extend(x)
                     else:
@@ -102,10 +103,10 @@ for i in range(44):
                                 EMAIL_IDS.append(email)
 
                 if len(ROLL_NOS) > 0:
-                    esharky.createCSV(len(ROLL_NOS),None,None,ROLL_NOS,[company_name]*len(ROLL_NOS))
+                    esharky.createCSV(len(ROLL_NOS), None, None, ROLL_NOS, [
+                                      company_name]*len(ROLL_NOS))
                 elif len(EMAIL_IDS) > 0:
-                    esharky.createCSV(len(EMAIL_IDS),None,EMAIL_IDS,None,[company_name]*len(EMAIL_IDS))
+                    esharky.createCSV(len(EMAIL_IDS), None, EMAIL_IDS, None, [
+                                      company_name]*len(EMAIL_IDS))
                 else:
                     print("NO RECORDS IN", company_name)
-
-
