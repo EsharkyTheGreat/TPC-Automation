@@ -68,42 +68,12 @@ for i in range(10):
                 content_split = content.text.split(" ")
                 for ele in content_split:
                     if "che19" in ele:
-                        pass
-                pass
-for table_ele in all_table_elements:
-    link_suffix = table_ele.a['href']
-    if 'shortlist' in link_suffix and '-ft' in link_suffix and 'interview' in link_suffix:
-        ROLL_NOS = []
-        EMAIL_IDS = []
-        company_name = link_suffix.split("/")[-2]
-        post_req = s.get(
-            "https://www.placement.iitbhu.ac.in/"+link_suffix).text
-        contentSoup = bs4.BeautifulSoup(post_req, 'html.parser')
-        content = contentSoup.find(
-            'td', attrs={'class': 'post-content'})
-        rolls = re.findall('\d{8}', content.text)
-        print(company_name)
-        if len(rolls) == 0:
-            # Must Be CSV or ODS
-            link = contentSoup.find("div", attrs={"class": "attachments"})
-            if len(link.text) > 0:
-                linkObject = link.a["href"]
-                linkName = linkObject.split("/")[-1].split(".")[-1]
-                print(linkName)
-                if "csv" == linkName:
-                    # Parse CSV
-                    pass
-                elif "ods" == linkName:
-                    with s.get("https://www.placement.iitbhu.ac.in/" + linkObject) as r:
-                        with open('./data.ods', "wb") as f:
-                            f.write(r.content)
-                    esharky.convertODStoCSV("./data.ods")
-                    with open("./data.csv", "r") as f:
-                        print(f.read())
-        else:
-            # Check for Name and Mail and write
-            # content_split = content.split(" ")
-            # for ele in content_split:
-            #     if "che19" in ele:
-            #         pass
-            pass
+                        x = re.findall('[A-Za-z0-9.]*.che19@i?itbhu\.ac\.in',ele)[0]
+                        EMAIL_IDS.append(x)
+                    if "19045" in ele:
+                        x = re.findall('\d{8}',ele)[0]
+                        ROLL_NOS.append(x)
+                print(ROLL_NOS)
+                print(EMAIL_IDS)
+                if len(ROLL_NOS) != len(EMAIL_IDS):
+                    print("---------------------NOT SAHI------------------------------")
