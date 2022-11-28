@@ -4,16 +4,14 @@ import sys
 def convertODStoCSV(filpath):
     os.system(f"libreoffice --convert-to csv {os.path.abspath(filpath)}")
 
-def createCSV(headings,name,email,rollno,company,outfile):
-    with open(outfile,"wb") as f:
-        heading = ",".join(headings)
-        f.write(heading)
-        f.write('\n')
-        for i in range(len(email)):
-            name = name[i] or 'None'
-            email = email[i] or 'None'
-            rollno = rollno[i] or 'None'
-            company = company[i] or 'None'
-            content = f'{name},{email},{rollno},{company}\n'
+# IMPORTANT -- DOES NOT WRITE HEADINGS!!!
+def createCSV(size,name,email,rollno,company):
+    with open('./finalData.csv',"a") as f:
+        for i in range(size):
+            Name = Email = Rollno = Company = "None"
+            if name: Name = name[i]
+            if email: Email = email[i]
+            if rollno: Rollno = rollno[i]
+            if company: Company = company[i]
+            content = f'{Name},{Email},{Rollno},{Company}\n'
             f.write(content)
-    print(f"Wrote to {outfile}")
