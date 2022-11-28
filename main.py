@@ -3,6 +3,9 @@ import bs4
 import re
 import shutil
 import esharky
+import config
+import csv
+
 
 LOGIN_URL = "https://www.placement.iitbhu.ac.in/accounts/login/"
 NOTICE_BOARD = "https://www.placement.iitbhu.ac.in/forum/c/notice-board/2022-23/"
@@ -17,9 +20,8 @@ s.headers['Referer'] = 'https://www.placement.iitbhu.ac.in/forum/'
 s.headers['X-CSRFToken'] = s.cookies['csrftoken']
 login_data = {
     'csrfmiddlewaretoken': s.cookies['csrftoken'],
-    'login': 'eshwar.s.che20@itbhu.ac.in',
-    'password': '87654321'
-}
+    'login': config.EMAIl,
+    'password': config.PASSWORD}
 res = s.post(LOGIN_URL, data=login_data)
 
 notice_board_req = s.get(NOTICE_BOARD)
@@ -46,15 +48,17 @@ for table_ele in all_table_elements:
             link = contentSoup.find("div", attrs={"class": "attachments"})
             if len(link.text) > 0:
                 linkObject = link.a["href"]
-                if "csv" in linkObject:
+                linkName = linkObject.split("/")[-1].split(".")[-1]
+                print(linkName)
+                if "csv" == linkName:
                     # Parse CSV
                     pass
-                elif "ods" in linkObject:
+                elif "ods" == linkName:
                     with s.get("https://www.placement.iitbhu.ac.in/" + linkObject) as r:
                         with open('./data.ods', "wb") as f:
                             f.write(r.content)
                     esharky.convertODStoCSV("./data.ods")
-                    with open("./data.csv","r") as f:
+                    with open("./data.csv", "r") as f:
                         print(f.read())
         else:
             # Check for Name and Mail and write
