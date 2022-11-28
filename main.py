@@ -73,5 +73,12 @@ for i in range(10):
                 content_split = content.text.split(" ")
                 for ele in content_split:
                     if "che19" in ele:
-                        pass
-                pass
+                        x = re.findall('[A-Za-z0-9.]*.che19@i?itbhu\.ac\.in',ele)[0]
+                        EMAIL_IDS.append(x)
+                    if "19045" in ele:
+                        x = re.findall('\d{8}',ele)[0]
+                        ROLL_NOS.append(x)
+                print(ROLL_NOS)
+                print(EMAIL_IDS)
+                if len(ROLL_NOS) != len(EMAIL_IDS):
+                    print("---------------------NOT SAHI------------------------------")
