@@ -5,12 +5,12 @@ import shutil
 import esharky
 import config
 import csv
+import esharky
 
 
 LOGIN_URL = "https://www.placement.iitbhu.ac.in/accounts/login/"
 NOTICE_BOARD = "https://www.placement.iitbhu.ac.in/forum/c/notice-board/2022-23/"
 
-print('Hello World')
 s = requests.Session()
 login_page_req = s.get(LOGIN_URL)
 
@@ -43,7 +43,12 @@ for i in range(10):
             content = contentSoup.find(
                 'td', attrs={'class': 'post-content'})
             rolls = re.findall('\d{8}', content.text)
+
             print(company_name)
+
+            # Converting roll numbers to CSV
+            esharky.createCSV(len(rolls), None,None,rolls,None)
+
             if len(rolls) == 0:
                 # Must Be CSV or ODS
                 link = contentSoup.find("div", attrs={"class": "attachments"})
