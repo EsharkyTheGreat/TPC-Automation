@@ -24,6 +24,8 @@ login_data = {
     'login': config.EMAIl,
     'password': config.PASSWORD}
 res = s.post(LOGIN_URL, data=login_data)
+XLSX = []
+company_without_any_chemical = []
 
 for i in range(44):
     notice_board_req = s.get(NOTICE_BOARD+f'?page={i+1}')
@@ -36,6 +38,7 @@ for i in range(44):
         if 'shortlist' in link_suffix and '-ft' in link_suffix and 'interview' in link_suffix:
             ROLL_NOS = []
             EMAIL_IDS = []
+
             company_name = link_suffix.split("/")[-2]
             post_req = s.get(
                 "https://www.placement.iitbhu.ac.in/"+link_suffix).text
@@ -61,7 +64,6 @@ for i in range(44):
                             email, roll = parseCSV(r.content)
                             esharky.createCSV(len(roll), None, email, roll, [
                                               company_name]*len(roll))
-                        pass
                     elif "ods" in linkObject:
                         with s.get("https://www.placement.iitbhu.ac.in/" + linkObject) as r:
                             with open('./data.ods', "wb") as f:
@@ -73,8 +75,17 @@ for i in range(44):
                                           company_name]*len(roll))
                     elif "xlsx" in linkObject:
                         # TODO: Parse xlsx
+                        XLSX.append(company_name)
                         print("XLSX")
+
+                # can be a case where name and email is provided and rolls is 0.
+                else:
+                    matchEmailOrRoll(content, ROLL_NOS, EmailRegex,
+                                     EMAIL_IDS, company_without_any_chemical, company_name)
+
             else:
+                matchEmailOrRoll(content, ROLL_NOS, EmailRegex,
+                                 EMAIL_IDS, company_without_any_chemical, company_name)
                 # Check for Name and Mail and write
                 #                content_split = content.text.split(" ")
                 #                for ele in content_split:
@@ -89,24 +100,11 @@ for i in range(44):
                 #                        ROLL_NOS.append(x)
                 #
 
-                lines = content.get_text(strip=True, separator='\n')
- #               print(content.get_text(strip=True,separator='\n'))
-                for line in lines.split():
-                    x = re.findall('19045\d{3}', line)
-                    if len(x) > 0:
-                        ROLL_NOS.extend(x)
-                    else:
-                        for email in EmailRegex.findall(line):
-                            if '.che19' in email:
-                                EMAIL_IDS.append(email)
-                            elif not '@itbhu.ac.in' in email and not '@iitbhu.ac.in' in email:
-                                EMAIL_IDS.append(email)
 
-                if len(ROLL_NOS) > 0:
-                    esharky.createCSV(len(ROLL_NOS), None, None, ROLL_NOS, [
-                                      company_name]*len(ROLL_NOS))
-                elif len(EMAIL_IDS) > 0:
-                    esharky.createCSV(len(EMAIL_IDS), None, EMAIL_IDS, None, [
-                                      company_name]*len(EMAIL_IDS))
-                else:
-                    print("NO RECORDS IN", company_name)
+with open("./noRecords.csv", "a") as f:
+    for i in XLSX:
+        content = f'{i},XLSX\n'
+        f.write(content)
+    for i in company_without_any_chemical:
+        content = f'{i},No record of roll, email, or personal email found\n'
+        f.write(content)

@@ -1,4 +1,5 @@
 import csv
+import esharky
 import re
 
 
@@ -38,3 +39,27 @@ def parseCSV(contentBytes):
             email.append("None")
 
     return email, roll
+
+
+def matchEmailOrRoll(content, ROLL_NOS, EmailRegex, EMAIL_IDS, company_without_any_chemical, company_name):
+    lines = content.get_text(strip=True, separator='\n')
+    for line in lines.split():
+        x = re.findall('19045\d{3}', line)
+        if len(x) > 0:
+            ROLL_NOS.extend(x)
+        else:
+            for email in EmailRegex.findall(line):
+                if '.che19' in email:
+                    EMAIL_IDS.append(email)
+                elif not '@itbhu.ac.in' in email and not '@iitbhu.ac.in' in email:
+                    EMAIL_IDS.append(email)
+
+    if len(ROLL_NOS) > 0:
+        esharky.createCSV(len(ROLL_NOS), None, None, ROLL_NOS, [
+            company_name]*len(ROLL_NOS))
+    elif len(EMAIL_IDS) > 0:
+        esharky.createCSV(len(EMAIL_IDS), None, EMAIL_IDS, None, [
+            company_name]*len(EMAIL_IDS))
+    else:
+        print("NO RECORDS IN", company_name)
+        company_without_any_chemical.append(company_name)
