@@ -23,9 +23,11 @@ login_data = {
     'csrfmiddlewaretoken': s.cookies['csrftoken'],
     'login': config.EMAIl,
     'password': config.PASSWORD}
+
+#Metadata
 res = s.post(LOGIN_URL, data=login_data)
-XLSX = []
 company_without_any_chemical = []
+all_companies = []
 
 for i in range(44):
     notice_board_req = s.get(NOTICE_BOARD+f'?page={i+1}')
@@ -48,6 +50,7 @@ for i in range(44):
             rolls = re.findall('\d{8}', content.text)
 
             print(company_name)
+            all_companies.append([company_name,"DONE", "https://www.placement.iitbhu.ac.in/"+link_suffix])
 
             # Converting roll numbers to CSV
             # esharky.createCSV(len(rolls), None,None,rolls,[company_name]*len(rolls))
@@ -75,7 +78,7 @@ for i in range(44):
                                           company_name]*len(roll))
                     elif "xlsx" in linkObject:
                         # TODO: Parse xlsx
-                        XLSX.append(company_name)
+                        all_companies[-1][1] = "XLSX"
                         print("XLSX")
 
                 # can be a case where name and email is provided and rolls is 0.
@@ -101,10 +104,11 @@ for i in range(44):
                 #
 
 
-with open("./noRecords.csv", "a") as f:
-    for i in XLSX:
-        content = f'{i},XLSX\n'
-        f.write(content)
-    for i in company_without_any_chemical:
-        content = f'{i},No record of roll, email, or personal email found\n'
-        f.write(content)
+with open("./noRecords.csv", "w") as f:
+    f.write("Company Name, Status, Link\n")
+    for i in all_companies:
+        if i[0] in company_without_any_chemical:
+            i[1] = "NO RECORD"
+        f.write(','.join(i))
+        f.write('\n')
+
